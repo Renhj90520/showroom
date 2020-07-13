@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --open --port 0",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -19,6 +19,7 @@
     "@angular/platform-browser": "~9.1.9",
     "@angular/platform-browser-dynamic": "~9.1.9",
     "@angular/router": "~9.1.9",
+    "lodash": "^4.17.15",
     "normalize.css": "^8.0.1",
     "rxjs": "~6.5.4",
     "three": "^0.118.3",

@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { ResourceManager } from './resource-manager';
-import Water from './water';
 export default class ExteriorScene extends THREE.Scene {
   width;
   height;
@@ -11,6 +9,7 @@ export default class ExteriorScene extends THREE.Scene {
       uuid: '894051E4-5885-411E-8A17-5BE4750089BF',
       name: 'glasses_merged',
       position: new THREE.Vector3(0, 0, 0),
+      material: '145961B8-30F6-411A-BC91-AE544EED3334',
     },
     {
       uuid: '92208585-35D3-438A-89C0-B834D3B26076',
@@ -189,8 +188,21 @@ export default class ExteriorScene extends THREE.Scene {
     const axesHelper = new THREE.AxesHelper(200);
     this.add(axesHelper);
 
+    this.addDirLight();
     this.addMeshes();
     console.log(this);
+  }
+  addDirLight() {
+    const light = new THREE.DirectionalLight(0xfffff5);
+    light.name = 'Directional Light';
+    light.position.set(
+      0.5917521025306018,
+      0.46445562905234217,
+      0.6588705622443649
+    );
+    light.target.position.set(0, 0, 0);
+    light.castShadow = true;
+    this.add(light);
   }
   addMeshes() {
     this.meshes.forEach((meshInfo) => {
@@ -215,9 +227,15 @@ export default class ExteriorScene extends THREE.Scene {
   }
 
   private addMesh(parent, meshInfo: any) {
+    let material;
+    if (meshInfo.material) {
+      material = this.resourceManager.getPbrMaterial(meshInfo.material);
+    } else {
+      material = new THREE.MeshBasicMaterial();
+    }
     const mesh = new THREE.Mesh(
       this.resourceManager.getGeometry(meshInfo.uuid),
-      new THREE.MeshBasicMaterial()
+      material
     );
     mesh.name = meshInfo.name;
     mesh.position.copy(meshInfo.position);

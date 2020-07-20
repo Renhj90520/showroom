@@ -6,6 +6,9 @@ import CompressedTextureLoader from './compressed-texture-loader';
 import CustomFileLoader from './custom-file-loader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { imagesInfo } from './images';
+import { textures } from './textures';
+import { pbrmaterials } from './materials';
+import CustomMaterialLoader from './CustomMaterialLoader';
 @Injectable()
 export class ResourceManager {
   geometriesUUID = [
@@ -100,7 +103,9 @@ export class ResourceManager {
   customFileLoader: CustomFileLoader;
   geometries = {};
   shes = {};
-  images = {};
+  pbrTextures = {};
+  pbrMaterials = {};
+
   public get texturePath(): string {
     return this._texturePath;
   }
@@ -239,6 +244,73 @@ export class ResourceManager {
     });
   }
 
+  parseAllPbrTextures() {
+    textures.forEach((textureInfo: any) => {
+      let texture;
+      if (textureInfo.images) {
+        const cubeImages = [];
+        for (let j = 0; j < textureInfo.images.length; j++) {
+          const imageId = textureInfo.images[j];
+          if (!this.getImage(imageId)) {
+            console.warn('THREE.ObjectLoader: Undefined image', imageId);
+          }
+          cubeImages.push(this.getImage(imageId));
+        }
+        texture = new THREE.CubeTexture(cubeImages);
+      } else {
+        if (!textureInfo.image) {
+          console.warn(
+            'THREE.ObjectLoader: No "image" specified for',
+            textureInfo.uuid
+          );
+        }
+        if (!this.getImage(textureInfo.image)) {
+          console.warn(
+            'THREE.ObjectLoader: Undefined image',
+            textureInfo.image
+          );
+        }
+        texture = new THREE.Texture(this.getImage(textureInfo.image));
+        texture.needsUpdate = true;
+        texture.uuid = textureInfo.uuid;
+        if (textureInfo.name) {
+          texture.name = textureInfo.name;
+        }
+        if (textureInfo.mapping) {
+          texture.mapping = textureInfo.mapping;
+        }
+        if (textureInfo.offset) {
+          texture.offset.fromArray(textureInfo.offset);
+        }
+        if (textureInfo.repeat) {
+          texture.repeat.fromArray(textureInfo.repeat);
+        }
+        if (textureInfo.wrap) {
+          texture.wrapS = textureInfo.wrap[0];
+          texture.wrapT = textureInfo.wrap[1];
+        }
+        if (textureInfo.minFilter) {
+          texture.minFilter = textureInfo.minFilter;
+        }
+        if (textureInfo.magFilter) {
+          texture.magFilter = textureInfo.magFilter;
+        }
+        if (textureInfo.anisotropy) {
+          texture.anisotropy = textureInfo.anisotropy;
+        }
+        if (textureInfo.flipY !== undefined) {
+          texture.flipY = textureInfo.flipY;
+        }
+
+        this.pbrTextures[textureInfo.uuid] = texture;
+      }
+    });
+  }
+
+  getPbrTexture(uuid) {
+    return this.pbrTextures[uuid];
+  }
+
   getTexture(path) {
     return this.textureCache.get(path);
   }
@@ -256,7 +328,7 @@ export class ResourceManager {
   }
 
   getImage(uuid) {
-    return this.images[uuid];
+    return this.imageCache.get(uuid);
   }
 
   load(onComplete) {
@@ -264,13 +336,37 @@ export class ResourceManager {
     const loaded = () => {
       count++;
       if (count === 5) {
+        this.parseMaterials();
         onComplete();
       }
     };
     this.loadSpecularCubemaps(null, loaded);
     this.loadSH(loaded);
-    this.loadImages(loaded);
+    this.loadImages(() => {
+      this.parseAllPbrTextures();
+      loaded();
+    });
     this.loadTextures(null, loaded);
     this.loadAllGeometries(loaded);
+  }
+  parseMaterials() {
+    const materialLoader = new CustomMaterialLoader(this);
+    materialLoader.setTextures(this.pbrTextures);
+    pbrmaterials.forEach((materialInfo) => {
+      if (materialInfo.type === 'ShaderMaterial') {
+        materialInfo.Color = materialInfo.color;
+        materialInfo.color = undefined;
+      }
+      const material: any = materialLoader.parse(materialInfo);
+      if (material.type === 'MultiMaterial') {
+        this.pbrMaterials[material.uuid] = material.materials;
+      } else {
+        this.pbrMaterials[material.uuid] = material;
+      }
+    });
+    console.log(this.pbrMaterials);
+  }
+  getPbrMaterial(uuid) {
+    return this.pbrMaterials[uuid];
   }
 }

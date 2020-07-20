@@ -4,6 +4,8 @@ import ExteriorScene from '../exterior-scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ResourceManager } from '../resource-manager';
 import Water from '../water';
+import MaterialManager from '../MaterialManager';
+import { configurables } from '../configurables';
 @Component({
   selector: 'app-stage',
   templateUrl: './stage.component.html',
@@ -25,6 +27,7 @@ export class StageComponent implements OnInit {
   controls: OrbitControls;
   resourceManager: ResourceManager;
   water: any;
+  materialManager: MaterialManager;
   constructor() {}
 
   ngOnInit(): void {
@@ -33,10 +36,17 @@ export class StageComponent implements OnInit {
     this.resourceManager = new ResourceManager();
     this.resourceManager.load(() => {
       this.initExteriorScene();
+      // this.initMaterialManager();
       this.initPool();
       this.camera = this.exterioScene.cameras[0];
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.update();
+    });
+  }
+  initMaterialManager() {
+    this.materialManager = new MaterialManager({
+      scenes: this.scenes,
+      configurables: configurables,
     });
   }
   initPool() {
@@ -68,6 +78,7 @@ export class StageComponent implements OnInit {
       this.height,
       this.resourceManager
     );
+    this.scenes.push(this.exterioScene);
   }
 
   initRenderer() {

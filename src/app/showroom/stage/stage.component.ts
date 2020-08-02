@@ -6,6 +6,8 @@ import { ResourceManager } from '../resource-manager';
 import Water from '../water';
 import MaterialManager from '../MaterialManager';
 import { configurables } from '../configurables';
+import InteriorScene from '../interior-scene';
+import { DollyCamera } from '../DollyCamera';
 @Component({
   selector: 'app-stage',
   templateUrl: './stage.component.html',
@@ -28,6 +30,7 @@ export class StageComponent implements OnInit {
   resourceManager: ResourceManager;
   water: any;
   materialManager: MaterialManager;
+  interiorScene: InteriorScene;
   constructor() {}
 
   ngOnInit(): void {
@@ -36,12 +39,38 @@ export class StageComponent implements OnInit {
     this.resourceManager = new ResourceManager();
     this.resourceManager.load(() => {
       this.initExteriorScene();
+      this.initInteriorScene();
+      this.init();
+      this.start();
+      this.initCamera();
       // this.initMaterialManager();
       this.initPool();
       this.camera = this.exterioScene.cameras[0];
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.update();
     });
+  }
+  start() {
+  }
+  init() {
+    this.initMaterialManager();
+  }
+  initCamera() {
+    this.camera = new DollyCamera({
+      states: this.scene.getObjectByName('cameras').children,
+      domElement: this.renderer.domElement,
+    });
+    this.camera.aspect = this.width / this.height;
+    this.scene.add(this.camera);
+  }
+  initInteriorScene() {
+    this.interiorScene = new InteriorScene(
+      this.width,
+      this.height,
+      this.resourceManager
+    );
+    this.scene = this.interiorScene;
+    this.scenes.push(this.interiorScene);
   }
   initMaterialManager() {
     this.materialManager = new MaterialManager({
@@ -63,13 +92,15 @@ export class StageComponent implements OnInit {
     this.exterioScene.add(this.water);
   }
   update() {
+    this.renderer.clear();
     const t = {
       delta: this.clock.getDelta(),
       elapsed: this.clock.getElapsedTime(),
     };
     this.water.update(t);
     this.controls.update();
-    this.renderer.render(this.exterioScene, this.exterioScene.cameras[0]);
+    // this.renderer.render(this.exterioScene, this.camera);
+    this.renderer.render(this.interiorScene, this.camera);
     requestAnimationFrame(this.update.bind(this));
   }
   initExteriorScene() {

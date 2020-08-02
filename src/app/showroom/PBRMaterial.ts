@@ -295,7 +295,7 @@ export default class PBRMaterial extends CustomRawShaderMaterial {
 
     #ifdef CUBEMAP
       vec3 textureCubemapLod(const in samplerCube texture, const in vec3 dir, const in float lod) {
-        vec4 rgba = textureLod(texture, dir, lod);
+        vec4 rgba = textureCubeLodEXT(texture, dir, lod);
       #ifdef FLOAT
         return rgba.rgb;
       #endif

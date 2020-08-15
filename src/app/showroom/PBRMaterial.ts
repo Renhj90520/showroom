@@ -871,7 +871,6 @@ export default class PBRMaterial extends CustomRawShaderMaterial {
     this.needsUpdate = true;
     this.extensions.derivatives = true;
     this.extensions.shaderTextureLOD = true;
-
     // this.extensions.drawBuffers = true;
     // this.extensions.fragDepth = true;
   }
@@ -935,6 +934,11 @@ export default class PBRMaterial extends CustomRawShaderMaterial {
     material.polygonOffset = opts.polygonOffset || false;
     material.polygonOffsetUnits = opts.polygonOffsetUnits || 0;
     material.polygonOffsetFactor = opts.polygonOffsetFactor || 0;
+
+    const occludes = ['coffee_table_feet', 'chair_feet', 'door_handle'];
+    if (occludes.indexOf(material.name) < 0) {
+      material.defines.OCCLUDE_SPECULAR = true;
+    }
 
     const defaultMap = resourceManager.getTexture('textures/white.png');
     const defaultNormalMap = resourceManager.getTexture('textures/normal.png');

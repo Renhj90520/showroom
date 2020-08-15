@@ -169,6 +169,24 @@ export default class InteriorScene extends THREE.Scene {
       aspect: 1.85423732,
       near: 0.3,
       far: 1500,
+      matrix: [
+        -0.944376469,
+        0.0,
+        -0.328866363,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.328866363,
+        0.0,
+        -0.944376469,
+        0.0,
+        -0.32,
+        1.4,
+        -1.39,
+        1.0,
+      ],
       position: new THREE.Vector3(-0.32, 1.4, -1.39),
       rotation: new THREE.Euler(-Math.PI, 0.3351029159471995, -Math.PI),
     },
@@ -198,6 +216,7 @@ export default class InteriorScene extends THREE.Scene {
     this.resourceManager = resourceManager;
     this.initCameras();
     this.initLights();
+    this.addUIPanel();
     this.addSuspendLamp();
     this.addRoom();
     this.addTripodLamp();
@@ -224,7 +243,73 @@ export default class InteriorScene extends THREE.Scene {
     this.add(axesHelper);
     console.log(this);
   }
+  addUIPanel() {
+    const uipanel = new THREE.Object3D();
+    uipanel.name = 'ui_panel';
+    uipanel.position.set(-12.201, -0.982, -3.46766567);
+    uipanel.scale.set(0.01, 0.01, 0.01);
+    this.add(uipanel);
 
+    const nameGeo = this.resourceManager.getGeometry(
+      '028BBF08-45BD-4CB4-B022-8EC27F7D16D7'
+    );
+    const nameMat = this.resourceManager.getPbrMaterial(
+      '618C3F83-144B-4A76-9B98-CE8CFF3199D0'
+    );
+    const name = new THREE.Mesh(nameGeo, nameMat);
+    name.name = 'name';
+    name.position.set(22, 12.7, 0);
+    name.scale.set(512, 100, 1);
+    name.castShadow = true;
+    name.receiveShadow = true;
+    name.visible = false;
+
+    uipanel.add(name);
+
+    const line = new THREE.Object3D();
+    line.name = 'line';
+    line.position.set(-233.5, -43.42, 0);
+    line.scale.set(410, 6, 1);
+    uipanel.add(line);
+    const lineGeo = this.resourceManager.getGeometry(
+      '028BBF08-45BD-4CB4-B022-8EC27F7D16D7'
+    );
+
+    const lineMesh = new THREE.Mesh(lineGeo);
+    lineMesh.name = 'line';
+    lineMesh.position.set(0.50000006, 0.13, 0);
+    lineMesh.castShadow = true;
+    lineMesh.receiveShadow = true;
+    line.add(lineMesh);
+
+    const materialGeo = this.resourceManager.getGeometry(
+      '028BBF08-45BD-4CB4-B022-8EC27F7D16D7'
+    );
+    const materialMat = this.resourceManager.getPbrMaterial(
+      'B43DF060-3348-4F5C-9E56-621D7D8369CF'
+    );
+    const material = new THREE.Mesh(materialGeo, materialMat);
+    material.name = 'material';
+    material.position.set(22.7000237, -109.5, 0);
+    material.scale.set(512, 128, 1);
+    material.castShadow = true;
+    material.receiveShadow = true;
+    uipanel.add(material);
+
+    const dimensionsGeo = this.resourceManager.getGeometry(
+      '028BBF08-45BD-4CB4-B022-8EC27F7D16D7'
+    );
+    const dimensionsMat = this.resourceManager.getPbrMaterial(
+      '9E2355AF-3225-479E-8985-F007C9D360BB'
+    );
+    const dimensions = new THREE.Mesh(dimensionsGeo, dimensionsMat);
+    dimensions.name = 'dimensions';
+    dimensions.position.set(22.7000237, -109.500015, 0);
+    dimensions.scale.set(512, 128, 1);
+    dimensions.castShadow = true;
+    dimensions.receiveShadow = true;
+    uipanel.add(dimensions);
+  }
   addInstructions() {
     const instructions = new THREE.Object3D();
     instructions.name = 'instructions';
@@ -278,7 +363,7 @@ export default class InteriorScene extends THREE.Scene {
       '0256DF06-5622-4774-9E99-4C48B2421826'
     );
     const artworksMerged = new THREE.Mesh(artworksMergedGeo, artworksMergedMat);
-    artworksMergedMat.name = 'artworks_merged';
+    artworksMerged.name = 'artworks_merged';
     artworksMerged.position.set(-2.25527954, -1.62184131, 2.71347427);
     artworksMerged.castShadow = true;
     artworksMerged.receiveShadow = true;
@@ -545,8 +630,10 @@ export default class InteriorScene extends THREE.Scene {
     );
     const tableStroke = new THREE.Mesh(tableStrokeGeo);
     tableStroke.name = 'table_stroke';
+    tableStroke.renderOrder = 1;
     tableStroke.visible = false;
     table.add(tableStroke);
+    table.renderOrder = 2;
   }
   addChairs() {
     const chairs = new THREE.Object3D();
@@ -690,14 +777,10 @@ export default class InteriorScene extends THREE.Scene {
       const material1Geo = this.resourceManager.getGeometry(
         '6823E7EE-ED1D-4CC9-8B54-F6E71BAD234C'
       );
-      const material1Mat = this.resourceManager.getPbrMaterial(
-        '5CA48FE9-BD0D-496C-BB93-0E778952D1D2'
-      );
-      const material1 = new THREE.Mesh(material1Geo, material1Mat);
-      materials.add(material1);
+      const materialMat = this.resourceManager.getPbrMaterial(uuid);
+      const material = new THREE.Mesh(material1Geo, materialMat);
+      materials.add(material);
     });
-
-    materials.visible = false;
 
     return materials;
   }
@@ -745,7 +828,7 @@ export default class InteriorScene extends THREE.Scene {
 
     canape.add(
       this.parseMaterials([
-        '6823E7EE-ED1D-4CC9-8B54-F6E71BAD234C',
+        '6A3317C4-0175-4EBD-95BC-40815B944B95',
         '96314477-BEDD-4E37-8AD6-C42A9A7DDDD4',
         'C55820BC-1CAC-495E-BFB9-87D1F4552144',
         '7B1BFD86-E711-4519-837D-7AF84EAE96BD',
@@ -756,7 +839,7 @@ export default class InteriorScene extends THREE.Scene {
       '227D58DA-AD40-4BA5-8E62-A7528C613869'
     );
     const canapeStroke = new THREE.Mesh(canapeStrokeGeo);
-    canapeStrokeGeo.name = 'canape_stroke';
+    canapeStroke.name = 'canape_stroke';
     canapeStroke.castShadow = true;
     canapeStroke.receiveShadow = true;
     canapeStroke.visible = false;
@@ -807,8 +890,8 @@ export default class InteriorScene extends THREE.Scene {
     coffeeTable.add(
       this.parseMaterials([
         '969B2D8B-78CF-4486-BBC7-3B9DFADBBA6F',
-        '6823E7EE-ED1D-4CC9-8B54-F6E71BAD234C',
-        '6823E7EE-ED1D-4CC9-8B54-F6E71BAD234C',
+        '39F82CB7-E939-47D7-BA74-8E81659370DE',
+        '78116878-57AF-46AA-9362-CD044313749A',
         '5975BDE1-9E34-43EF-AE55-BB1DC81A35BF',
       ])
     );
@@ -915,7 +998,7 @@ export default class InteriorScene extends THREE.Scene {
       '028BBF08-45BD-4CB4-B022-8EC27F7D16D7'
     );
     const seaHighlights2Mat = this.resourceManager.getPbrMaterial(
-      '1664909F-CE80-44FF-8B4D-16C651F68BEA'
+      '4AAD14BE-2730-455C-B8B2-59CC2B54F5D7'
     );
     const seaHighlights2 = new THREE.Mesh(seaHighlights2Geo, seaHighlights2Mat);
     seaHighlights2.name = 'sea_highlights2';
@@ -1364,7 +1447,7 @@ export default class InteriorScene extends THREE.Scene {
       '047E2E45-295D-4964-8D25-A5491883413D'
     );
     const baseBoards = new THREE.Mesh(baseBoardsGeo, baseBoardsMat);
-    baseBoardsMat.name = 'baseboards';
+    baseBoards.name = 'baseboards';
     baseBoards.position.set(-0.25743866, 1.42000043, 0.06832886);
     baseBoards.rotation.set(Math.PI / 2, 0, 0);
     baseBoards.scale.set(100, 100, 100);
@@ -1401,6 +1484,8 @@ export default class InteriorScene extends THREE.Scene {
     suspended_lamp.position.set(2.144, 1.658, 0.141);
     suspended_lamp.rotation.set(1.5707964460041988, 0, 0);
     suspended_lamp.scale.set(100, 100, 100);
+    suspended_lamp.renderOrder = 2;
+    this.add(suspended_lamp);
 
     const pointLight = new THREE.PointLight(0xffffff, 0.35, 10, 2);
     pointLight.position.set(0, 0.00004, 0.00034);
@@ -1420,10 +1505,10 @@ export default class InteriorScene extends THREE.Scene {
       '1CF488CC-89FD-47A7-BFC5-15D8135D49D5'
     );
     const suspendedLampStroke = new THREE.Mesh(suspendedLampStrokeGeo);
+    suspendedLampStroke.name = 'suspended_lamp_stroke';
     suspendedLampStroke.visible = false;
     suspended_lamp.add(suspendedLampStroke);
-
-    this.add(suspended_lamp);
+    suspendedLampStroke.renderOrder = 1;
   }
   initLights() {
     const oceanLight = new THREE.DirectionalLight(0xfffff5, 1.53);
@@ -1443,6 +1528,7 @@ export default class InteriorScene extends THREE.Scene {
       0.6604094507512435
     );
     dirLight.castShadow = true;
+    dirLight.visible = false;
     const dirLightHelper = new THREE.DirectionalLightHelper(dirLight);
     this.add(dirLightHelper);
     this.add(dirLight);
@@ -1450,7 +1536,7 @@ export default class InteriorScene extends THREE.Scene {
   initCameras() {
     const cameras = new THREE.Object3D();
     cameras.name = 'cameras';
-    this.cameraInfos.forEach((info) => {
+    this.cameraInfos.forEach((info: any) => {
       const camera = new THREE.PerspectiveCamera(
         info.fov,
         info.aspect,
@@ -1458,16 +1544,22 @@ export default class InteriorScene extends THREE.Scene {
         info.far
       );
       camera.name = info.name;
-      camera.position.copy(info.position);
-      camera.rotation.copy(info.rotation);
+      if (info.matrix) {
+        const emptyMatrix = new THREE.Matrix4();
+        emptyMatrix.fromArray(info.matrix);
+        emptyMatrix.decompose(camera.position, camera.quaternion, camera.scale);
+      } else {
+        camera.position.copy(info.position);
+        camera.rotation.copy(info.rotation);
+      }
       if (info.target) {
         const target = new THREE.Object3D();
         target.position.copy(info.target);
         camera.add(target);
         const cameraHelper = new THREE.CameraHelper(camera);
-        cameras.add(camera);
         // cameras.add(cameraHelper);
       }
+      cameras.add(camera);
     });
     this.add(cameras);
   }

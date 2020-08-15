@@ -354,7 +354,6 @@ export class ResourceManager {
     materialLoader.setTextures(this.pbrTextures);
     pbrmaterials.forEach((materialInfo) => {
       if (materialInfo.type === 'ShaderMaterial') {
-        materialInfo.Color = materialInfo.color;
         materialInfo.color = undefined;
       }
       const material: any = materialLoader.parse(materialInfo);

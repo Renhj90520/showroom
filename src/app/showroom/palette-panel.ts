@@ -43,7 +43,7 @@ export default class PalettePanel extends THREE.Object3D {
     panel.resize(512, 512);
     switch (type) {
       case 'name':
-        panel.draw(text, '96px "AlternateGothic3"', 'white', 2);
+        panel.draw(text, '70px "AlternateGothic3"', 'white', 2);
         break;
       case 'dimensions':
         panel.draw(text, '24px "Work Sans"', 'white', 2);
@@ -287,7 +287,7 @@ export default class PalettePanel extends THREE.Object3D {
         const onComplete = () => {
           this.innerContainer.remove(this.materialObj);
           this.materialObj = objClone;
-          this.materialObj.position.setX(x + 200);
+          this.materialObj.position.setX(x);
           this.materialTween = null;
         };
         this.materialTween = TweenLite.to({}, 0.5, {

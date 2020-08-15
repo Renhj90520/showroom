@@ -159,7 +159,15 @@ export default class Palette extends THREE.Object3D {
     tl.staggerTo(
       this.children,
       0.35,
-      { material: { opacity: 0 }, stroke: { material: { opacity: 0 } } },
+      {
+        onUpdate: (self) => {
+          const progress = self.progress();
+          const opacity = 1 - progress;
+          self.target.material.opacity = opacity;
+          self.target.stroke.opacity = opacity;
+        },
+        onUpdateParams: ['{self}'],
+      },
       0
     );
     tl.eventCallback('onComplete', () => {

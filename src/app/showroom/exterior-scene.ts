@@ -205,7 +205,7 @@ export default class ExteriorScene extends THREE.Scene {
     this.initCameras();
 
     const axesHelper = new THREE.AxesHelper(200);
-    this.add(axesHelper);
+    // this.add(axesHelper);
 
     this.addDirLight();
     this.addMeshes();

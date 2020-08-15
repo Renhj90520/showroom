@@ -240,7 +240,7 @@ export default class InteriorScene extends THREE.Scene {
     this.addInstructions();
 
     const axesHelper = new THREE.AxesHelper(200);
-    this.add(axesHelper);
+    // this.add(axesHelper);
     console.log(this);
   }
   addUIPanel() {
@@ -1530,7 +1530,7 @@ export default class InteriorScene extends THREE.Scene {
     dirLight.castShadow = true;
     dirLight.visible = false;
     const dirLightHelper = new THREE.DirectionalLightHelper(dirLight);
-    this.add(dirLightHelper);
+    // this.add(dirLightHelper);
     this.add(dirLight);
   }
   initCameras() {
